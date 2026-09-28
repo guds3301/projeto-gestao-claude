@@ -1,9 +1,21 @@
 <title>Padaria Trigo &amp; Brasa</title>
+<meta name="description" content="Padaria de bairro na Vila Mariana com forno a lenha. Pão francês cinco vezes por dia, encomendas de bolos e salgados.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Bakery",
+  "name": "Padaria Trigo & Brasa",
+  "address": { "@type": "PostalAddress", "streetAddress": "Rua das Acácias, 214", "addressLocality": "São Paulo", "addressRegion": "SP", "addressCountry": "BR" },
+  "telephone": "+55 11 90000-1234",
+  "priceRange": "$",
+  "openingHours": ["Mo-Fr 05:30-20:00", "Sa 06:00-20:00", "Su 06:00-13:00"]
+}
+</script>
 <style>
-  /* Layout: padaria de bairro com azulejo azul; hero em duas colunas (promessa + próxima fornada), seções empilhadas */
+  /* Layout: padaria de bairro com azulejo português; hero com painel de azulejos desenhado em canvas, fornadas como linha do tempo do dia, encomenda rápida que monta o pedido */
   :root {
     --bg: #fbfaf7;
     --surface: #ffffff;
@@ -11,120 +23,167 @@
     --muted: #5d6478;
     --azulejo: #1f4fa3;
     --azulejo-soft: #e6ecf8;
-    --crust: #b8792a;
+    --crust: #a86a1f;
     --line: #dfe3ec;
+    --ok: #2f7d4f;
     --display: "Young Serif", Georgia, "Times New Roman", serif;
     --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #11151f; --surface: #182031; --ink: #eef1f7; --muted: #a3abc0;
-      --azulejo: #8fb0ee; --azulejo-soft: #1d2a45; --crust: #e0a458; --line: #2a3448;
+      --azulejo: #8fb0ee; --azulejo-soft: #1d2a45; --crust: #e0a458; --line: #2a3448; --ok: #6fcf97;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
     --bg: #11151f; --surface: #182031; --ink: #eef1f7; --muted: #a3abc0;
-    --azulejo: #8fb0ee; --azulejo-soft: #1d2a45; --crust: #e0a458; --line: #2a3448;
+    --azulejo: #8fb0ee; --azulejo-soft: #1d2a45; --crust: #e0a458; --line: #2a3448; --ok: #6fcf97;
     color-scheme: dark;
   }
 
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; }
-  h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.15; text-wrap: balance; margin: 0; }
-  h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.12; text-wrap: balance; margin: 0; }
+  h2 { font-size: clamp(1.9rem, 4vw, 2.6rem); }
   p { margin: 0; }
   a { color: var(--azulejo); }
-  a:focus-visible, button:focus-visible { outline: 3px solid var(--crust); outline-offset: 3px; border-radius: 4px; }
+  :focus-visible { outline: 3px solid var(--crust); outline-offset: 3px; border-radius: 4px; }
   .eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--crust); }
+  .num { font-variant-numeric: tabular-nums; }
 
-  /* faixa de azulejo feita só com CSS */
-  .tiles {
-    height: 28px;
-    background-color: var(--azulejo-soft);
-    background-image:
-      radial-gradient(circle at 50% 50%, var(--azulejo) 0 3px, transparent 4px),
-      conic-gradient(from 45deg, var(--azulejo) 0 25%, transparent 0 50%, var(--azulejo) 0 75%, transparent 0);
-    background-size: 28px 28px, 14px 14px;
-    background-position: 0 0, 7px 7px;
-    opacity: .9;
-  }
-
-  header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
-  .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; flex-wrap: wrap; }
-  .brand { font-family: var(--display); font-size: 1.4rem; color: var(--ink); text-decoration: none; }
-  .brand span { color: var(--crust); }
-  .nav ul { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
-  .nav ul a { color: var(--muted); text-decoration: none; font-weight: 500; font-size: .95rem; }
-  .nav ul a:hover { color: var(--ink); }
-  .btn { display: inline-block; background: var(--azulejo); color: var(--bg); padding: 12px 20px; border-radius: 999px; font-weight: 600; text-decoration: none; border: 0; font: inherit; font-weight: 600; cursor: pointer; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; background: var(--azulejo); color: var(--bg); padding: 13px 22px; border-radius: 999px; font: inherit; font-weight: 600; text-decoration: none; border: 0; cursor: pointer; }
   .btn:hover { filter: brightness(1.1); }
   .btn.ghost { background: transparent; color: var(--azulejo); box-shadow: inset 0 0 0 2px var(--azulejo); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
 
-  .hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 48px; align-items: center; padding-block: 64px 56px; }
+  /* topo */
+  header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+  .brand { font-family: var(--display); font-size: 1.45rem; color: var(--ink); text-decoration: none; white-space: nowrap; }
+  .brand span { color: var(--crust); }
+  .nav ul { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; }
+  .nav ul a { color: var(--muted); text-decoration: none; font-weight: 500; font-size: .95rem; }
+  .nav ul a:hover { color: var(--ink); }
+  .status { display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  .status i { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+  .status.open { color: var(--ok); }
+  .status.open i { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 20%, transparent); }
+
+  /* hero */
+  .hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: center; padding-block: 56px 64px; }
   .hero > * { min-width: 0; }
-  .hero h1 { font-size: clamp(2.4rem, 6vw, 3.8rem); margin-block: 12px 18px; }
-  .hero p.lead { font-size: 1.15rem; color: var(--muted); max-width: 34em; }
-  .hero .ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+  .hero h1 { font-size: clamp(2.5rem, 6vw, 4.2rem); margin-block: 14px 20px; }
+  .hero h1 em { font-style: normal; color: var(--azulejo); }
+  .hero .lead { font-size: 1.15rem; color: var(--muted); max-width: 32em; }
+  .hero .ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
+  .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 24px; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .facts div { display: grid; }
+  .facts b { font-family: var(--display); font-weight: 400; font-size: 1.7rem; line-height: 1.1; }
+  .facts span { color: var(--muted); font-size: .9rem; }
 
-  .oven { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
-  .oven .tiles { height: 18px; background-size: 18px 18px, 9px 9px; background-position: 0 0, 4.5px 4.5px; }
-  .oven-body { padding: 24px; display: grid; gap: 6px; }
-  .oven-time { font-family: var(--display); font-size: 3.2rem; line-height: 1; color: var(--azulejo); font-variant-numeric: tabular-nums; }
-  .oven-what { font-size: 1.15rem; font-weight: 600; }
-  .oven-note { color: var(--muted); font-size: .92rem; }
+  .panel { position: relative; }
+  .panel canvas { display: block; width: 100%; aspect-ratio: 1 / 1; max-width: 100%; border-radius: 6px; box-shadow: 0 1px 0 var(--line), 0 24px 48px -28px rgba(20, 40, 90, .45); }
+  .oven { position: absolute; left: -24px; bottom: -24px; width: min(290px, 80%); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: grid; gap: 4px; box-shadow: 0 16px 40px -20px rgba(0, 0, 0, .35); }
+  .oven-time { font-family: var(--display); font-size: 2.6rem; line-height: 1; color: var(--azulejo); }
+  .oven-what { font-weight: 600; }
+  .oven-note { color: var(--muted); font-size: .88rem; }
 
-  section { padding-block: 64px; border-top: 1px solid var(--line); }
-  .section-head { display: grid; gap: 8px; margin-bottom: 32px; max-width: 40em; }
-  .section-head p { color: var(--muted); }
+  section { padding-block: 72px; border-top: 1px solid var(--line); }
+  .head { display: grid; gap: 10px; margin-bottom: 36px; max-width: 42em; }
+  .head p { color: var(--muted); }
 
-  /* horário das fornadas: sequência real do dia */
-  .schedule { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-  .schedule li { border-top: 3px solid var(--line); padding-top: 12px; display: grid; gap: 2px; }
-  .schedule li.next { border-top-color: var(--crust); }
-  .schedule time { font-family: var(--display); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
-  .schedule span { color: var(--muted); font-size: .95rem; }
-  .schedule li.next span::after { content: " · próxima"; color: var(--crust); font-weight: 600; }
+  /* linha do tempo das fornadas */
+  .timeline { position: relative; padding-top: 34px; }
+  .track { position: absolute; top: 12px; left: 0; right: 0; height: 4px; border-radius: 2px; background: var(--line); }
+  .track .now { position: absolute; top: -6px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: var(--crust); box-shadow: 0 0 0 5px color-mix(in srgb, var(--crust) 22%, transparent); }
+  .track .now::after { content: attr(data-label); position: absolute; top: -26px; left: 50%; transform: translateX(-50%); font-size: .75rem; font-weight: 700; color: var(--crust); white-space: nowrap; }
+  .schedule { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  .schedule li { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 2px; }
+  .schedule li.done { opacity: .55; }
+  .schedule li.next { border-color: var(--crust); box-shadow: inset 0 0 0 1px var(--crust); }
+  .schedule time { font-family: var(--display); font-size: 1.6rem; }
+  .schedule strong { font-weight: 600; }
+  .schedule small { color: var(--muted); font-size: .85rem; }
+  .schedule .tag { justify-self: start; margin-top: 6px; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--crust); }
 
-  .menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 56px; }
-  .menu h3 { font-size: 1.35rem; margin-bottom: 12px; }
-  .menu dl { margin: 0; display: grid; gap: 10px; }
+  /* cardápio */
+  .menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 44px 64px; }
+  .menu h3 { font-size: 1.4rem; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+  .menu h3::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .menu dl { margin: 0; display: grid; gap: 12px; }
   .menu .row { display: flex; align-items: baseline; gap: 10px; }
-  .menu dt { font-weight: 500; }
+  .menu dt { font-weight: 500; min-width: 0; }
   .menu dt small { display: block; color: var(--muted); font-weight: 400; font-size: .88rem; }
-  .menu .dots { flex: 1; border-bottom: 1px dotted var(--muted); opacity: .5; transform: translateY(-4px); min-width: 16px; }
-  .menu dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .menu .dots { flex: 1; border-bottom: 1px dotted var(--muted); opacity: .5; transform: translateY(-5px); min-width: 16px; }
+  .menu dd { margin: 0; font-weight: 600; white-space: nowrap; }
+  .star { display: inline-block; margin-left: 6px; font-size: .7rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--azulejo); background: var(--azulejo-soft); padding: 2px 8px; border-radius: 999px; vertical-align: 2px; }
 
-  .orders { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .order { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; display: grid; gap: 8px; align-content: start; }
-  .order h3 { font-size: 1.25rem; }
-  .order .price { font-weight: 700; color: var(--azulejo); font-variant-numeric: tabular-nums; }
-  .order p { color: var(--muted); font-size: .95rem; }
-  .order .lead-time { font-size: .82rem; font-weight: 600; color: var(--crust); letter-spacing: .04em; text-transform: uppercase; }
+  /* encomenda rápida */
+  .order { display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; align-items: start; }
+  .order > * { min-width: 0; }
+  .items { display: grid; gap: 12px; }
+  .item { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .item h3 { font-family: var(--body); font-weight: 600; font-size: 1.05rem; }
+  .item p { color: var(--muted); font-size: .9rem; }
+  .item .meta { font-size: .8rem; font-weight: 600; color: var(--crust); margin-top: 4px; }
+  .stepper { display: flex; align-items: center; gap: 4px; }
+  .stepper button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 1.2rem; line-height: 1; cursor: pointer; }
+  .stepper button:hover { border-color: var(--azulejo); color: var(--azulejo); }
+  .stepper output { min-width: 32px; text-align: center; font-weight: 700; }
+  .summary { background: var(--azulejo); color: var(--bg); border-radius: 16px; padding: 24px; display: grid; gap: 14px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); }
+  .summary .eyebrow { color: color-mix(in srgb, var(--bg) 75%, transparent); }
+  .summary ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .95rem; }
+  .summary li { display: flex; justify-content: space-between; gap: 12px; }
+  .summary .total { font-family: var(--display); font-size: 2.4rem; line-height: 1; }
+  .summary label { display: flex; align-items: center; gap: 10px; font-size: .95rem; cursor: pointer; }
+  .summary input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--crust); }
+  .summary pre { white-space: pre-wrap; margin: 0; font: inherit; font-size: .88rem; background: color-mix(in srgb, var(--bg) 14%, transparent); border-radius: 10px; padding: 12px; }
+  .summary .btn { background: var(--bg); color: var(--azulejo); justify-content: center; }
+  .summary .small { font-size: .82rem; color: color-mix(in srgb, var(--bg) 80%, transparent); }
 
-  .visit { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  /* dúvidas */
+  .faq { display: grid; gap: 10px; max-width: 780px; }
+  .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px 20px; }
+  .faq summary { cursor: pointer; font-weight: 600; padding-block: 14px; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; color: var(--azulejo); font-size: 1.3rem; line-height: 1; }
+  .faq details[open] summary::after { content: "–"; }
+  .faq details p { color: var(--muted); padding-bottom: 16px; }
+
+  /* visite */
+  .visit { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
   .visit > * { min-width: 0; }
-  .hours { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  .hours td { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .hours { width: 100%; border-collapse: collapse; }
+  .hours td { padding: 11px 0; border-bottom: 1px solid var(--line); }
   .hours td:last-child { text-align: right; font-weight: 600; }
-  .contact { display: grid; gap: 18px; }
-  .contact .label { font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-  .contact .value { font-size: 1.1rem; }
-  .copy { font: inherit; font-size: .85rem; margin-left: 8px; background: var(--azulejo-soft); color: var(--azulejo); border: 0; border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+  .hours tr.today td { color: var(--azulejo); }
+  .hours tr.today td:first-child::after { content: " · hoje"; font-weight: 700; font-size: .85rem; }
+  .contact { display: grid; gap: 20px; align-content: start; }
+  .contact .label { font-size: .76rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .contact .value { font-size: 1.1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .copy { font: inherit; font-size: .82rem; background: var(--azulejo-soft); color: var(--azulejo); border: 0; border-radius: 999px; padding: 4px 12px; cursor: pointer; }
 
-  footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: .9rem; }
+  footer { border-top: 1px solid var(--line); padding-block: 28px 96px; color: var(--muted); font-size: .9rem; }
   footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 
-  @media (max-width: 860px) {
-    .hero, .visit { grid-template-columns: 1fr; gap: 32px; }
+  .fab { position: fixed; right: 20px; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); z-index: 20; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .45); }
+
+  @media (max-width: 900px) {
+    .hero, .visit, .order { grid-template-columns: 1fr; gap: 40px; }
+    .oven { left: 12px; bottom: -28px; }
+    .panel { margin-bottom: 20px; }
     .schedule { grid-template-columns: repeat(2, 1fr); }
-    .menu, .orders { grid-template-columns: 1fr; }
+    .track { display: none; }
+    .timeline { padding-top: 0; }
+    .menu { grid-template-columns: 1fr; }
     .nav ul { display: none; }
+    .summary { position: static; }
   }
-  @media (prefers-reduced-motion: no-preference) {
-    .oven-time { transition: color .3s; }
-  }
+  @media (max-width: 420px) { .status span { display: none; } }
 </style>
 
 <header class="top">
@@ -133,56 +192,63 @@
     <ul>
       <li><a href="#fornadas">Fornadas</a></li>
       <li><a href="#cardapio">Cardápio</a></li>
-      <li><a href="#encomendas">Encomendas</a></li>
+      <li><a href="#encomenda">Encomendas</a></li>
       <li><a href="#visite">Onde estamos</a></li>
     </ul>
-    <a class="btn" href="#encomendas">Fazer encomenda</a>
+    <p class="status" id="status"><i></i><span id="status-text">Carregando horário</span></p>
   </div>
 </header>
 
 <main id="inicio">
-  <div class="tiles" aria-hidden="true"></div>
   <div class="wrap hero">
     <div>
       <p class="eyebrow">Padaria de bairro · Vila Mariana · desde 1987</p>
-      <h1>Pão quente saindo do forno cinco vezes por dia.</h1>
-      <p class="lead">Pão francês com casca que estala, pão de queijo de polvilho azedo e bolo do dia feito de manhã. Receitas da família Almeida, forno a lenha no fundo da loja.</p>
+      <h1>Pão quente saindo do forno <em>cinco vezes</em> por dia.</h1>
+      <p class="lead">Pão francês com casca que estala, pão de queijo de polvilho azedo e bolo feito de manhã. Receitas da família Almeida, assadas no forno a lenha do fundo da loja.</p>
       <div class="ctas">
-        <a class="btn" href="#cardapio">Ver cardápio e preços</a>
-        <a class="btn ghost" href="#visite">Como chegar</a>
+        <a class="btn" href="#encomenda">Montar encomenda</a>
+        <a class="btn ghost" href="#cardapio">Ver cardápio</a>
+      </div>
+      <div class="facts">
+        <div><b>37 anos</b><span>no mesmo endereço</span></div>
+        <div><b>5 fornadas</b><span>por dia, das 6h às 17h</span></div>
+        <div><b>48 h</b><span>de fermentação natural</span></div>
       </div>
     </div>
-    <aside class="oven" aria-live="polite">
-      <div class="tiles" aria-hidden="true"></div>
-      <div class="oven-body">
+    <div class="panel">
+      <canvas id="tiles" aria-label="Painel de azulejos azuis e brancos" role="img"></canvas>
+      <aside class="oven" aria-live="polite">
         <p class="eyebrow">Próxima fornada</p>
-        <p class="oven-time" id="next-time">10h00</p>
+        <p class="oven-time num" id="next-time">10h00</p>
         <p class="oven-what" id="next-what">Pão francês</p>
-        <p class="oven-note" id="next-note">Chegue 10 minutos antes para pegar o pão ainda quente.</p>
-      </div>
-    </aside>
+        <p class="oven-note" id="next-note">Chegue 10 minutos antes para pegar quentinho.</p>
+      </aside>
+    </div>
   </div>
 
   <section id="fornadas">
     <div class="wrap">
-      <div class="section-head">
+      <div class="head">
         <p class="eyebrow">Horário das fornadas</p>
         <h2>Saiba a hora certa de passar aqui</h2>
-        <p>Assamos em pequenas quantidades ao longo do dia, então o pão da tarde é tão fresco quanto o da manhã.</p>
+        <p>Assamos em pequenas quantidades ao longo do dia. O pão das cinco da tarde é tão fresco quanto o das seis da manhã.</p>
       </div>
-      <ol class="schedule" id="schedule">
-        <li data-h="6" data-m="0"><time>6h00</time><span>Pão francês</span></li>
-        <li data-h="7" data-m="30"><time>7h30</time><span>Pão de queijo</span></li>
-        <li data-h="10" data-m="0"><time>10h00</time><span>Pão francês</span></li>
-        <li data-h="15" data-m="30"><time>15h30</time><span>Bolos do dia</span></li>
-        <li data-h="17" data-m="0"><time>17h00</time><span>Pão francês</span></li>
-      </ol>
+      <div class="timeline">
+        <div class="track" aria-hidden="true"><span class="now" id="now-dot" data-label="agora"></span></div>
+        <ol class="schedule" id="schedule">
+          <li data-t="360"><time class="num">6h00</time><strong>Pão francês</strong><small>A primeira e a maior do dia</small></li>
+          <li data-t="450"><time class="num">7h30</time><strong>Pão de queijo</strong><small>Sai em bandejas de 40</small></li>
+          <li data-t="600"><time class="num">10h00</time><strong>Pão francês</strong><small>Para o almoço</small></li>
+          <li data-t="930"><time class="num">15h30</time><strong>Bolos do dia</strong><small>Fubá, cenoura e laranja</small></li>
+          <li data-t="1020"><time class="num">17h00</time><strong>Pão francês</strong><small>Para o café da tarde</small></li>
+        </ol>
+      </div>
     </div>
   </section>
 
   <section id="cardapio">
     <div class="wrap">
-      <div class="section-head">
+      <div class="head">
         <p class="eyebrow">Cardápio</p>
         <h2>Do balcão para a sua mesa</h2>
       </div>
@@ -190,67 +256,74 @@
         <div>
           <h3>Pães</h3>
           <dl>
-            <div class="row"><dt>Pão francês<small>vendido por peso</small></dt><span class="dots"></span><dd>R$ 18,90/kg</dd></div>
-            <div class="row"><dt>Fermentação natural<small>48 horas de fermentação, 800 g</small></dt><span class="dots"></span><dd>R$ 26,00</dd></div>
-            <div class="row"><dt>Pão de queijo<small>polvilho azedo e queijo canastra</small></dt><span class="dots"></span><dd>R$ 4,50</dd></div>
-            <div class="row"><dt>Pão de milho</dt><span class="dots"></span><dd>R$ 14,00</dd></div>
+            <div class="row"><dt>Pão francês <span class="star">mais vendido</span><small>vendido por peso</small></dt><span class="dots"></span><dd class="num">R$ 18,90/kg</dd></div>
+            <div class="row"><dt>Fermentação natural<small>48 horas de fermentação, 800 g</small></dt><span class="dots"></span><dd class="num">R$ 26,00</dd></div>
+            <div class="row"><dt>Pão de queijo<small>polvilho azedo e queijo canastra</small></dt><span class="dots"></span><dd class="num">R$ 4,50</dd></div>
+            <div class="row"><dt>Pão de milho</dt><span class="dots"></span><dd class="num">R$ 14,00</dd></div>
           </dl>
         </div>
         <div>
           <h3>Doces</h3>
           <dl>
-            <div class="row"><dt>Sonho de creme</dt><span class="dots"></span><dd>R$ 7,00</dd></div>
-            <div class="row"><dt>Bolo de fubá com goiabada<small>fatia</small></dt><span class="dots"></span><dd>R$ 8,00</dd></div>
-            <div class="row"><dt>Bolo de fubá com goiabada<small>inteiro, 1,2 kg</small></dt><span class="dots"></span><dd>R$ 42,00</dd></div>
-            <div class="row"><dt>Carolina de doce de leite</dt><span class="dots"></span><dd>R$ 5,50</dd></div>
+            <div class="row"><dt>Sonho de creme <span class="star">da casa</span></dt><span class="dots"></span><dd class="num">R$ 7,00</dd></div>
+            <div class="row"><dt>Bolo de fubá com goiabada<small>fatia</small></dt><span class="dots"></span><dd class="num">R$ 8,00</dd></div>
+            <div class="row"><dt>Carolina de doce de leite</dt><span class="dots"></span><dd class="num">R$ 5,50</dd></div>
+            <div class="row"><dt>Pudim de leite<small>fatia</small></dt><span class="dots"></span><dd class="num">R$ 9,00</dd></div>
           </dl>
         </div>
         <div>
           <h3>Salgados</h3>
           <dl>
-            <div class="row"><dt>Coxinha de frango com catupiry</dt><span class="dots"></span><dd>R$ 8,50</dd></div>
-            <div class="row"><dt>Esfiha de carne</dt><span class="dots"></span><dd>R$ 7,00</dd></div>
-            <div class="row"><dt>Misto quente na chapa</dt><span class="dots"></span><dd>R$ 12,00</dd></div>
+            <div class="row"><dt>Coxinha de frango com catupiry</dt><span class="dots"></span><dd class="num">R$ 8,50</dd></div>
+            <div class="row"><dt>Esfiha de carne</dt><span class="dots"></span><dd class="num">R$ 7,00</dd></div>
+            <div class="row"><dt>Misto quente na chapa</dt><span class="dots"></span><dd class="num">R$ 12,00</dd></div>
           </dl>
         </div>
         <div>
           <h3>Bebidas</h3>
           <dl>
-            <div class="row"><dt>Café coado</dt><span class="dots"></span><dd>R$ 5,00</dd></div>
-            <div class="row"><dt>Pingado</dt><span class="dots"></span><dd>R$ 6,50</dd></div>
-            <div class="row"><dt>Suco de laranja<small>espremido na hora, 400 ml</small></dt><span class="dots"></span><dd>R$ 10,00</dd></div>
+            <div class="row"><dt>Café coado</dt><span class="dots"></span><dd class="num">R$ 5,00</dd></div>
+            <div class="row"><dt>Pingado</dt><span class="dots"></span><dd class="num">R$ 6,50</dd></div>
+            <div class="row"><dt>Suco de laranja<small>espremido na hora, 400 ml</small></dt><span class="dots"></span><dd class="num">R$ 10,00</dd></div>
           </dl>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="encomendas">
+  <section id="encomenda">
     <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">Encomendas</p>
-        <h2>Festas, reuniões e café da manhã</h2>
-        <p>Peça pelo WhatsApp com a antecedência indicada. Retirada na loja ou entrega no bairro por R$ 10,00.</p>
+      <div class="head">
+        <p class="eyebrow">Encomenda rápida</p>
+        <h2>Monte o pedido e mande pelo WhatsApp</h2>
+        <p>Escolha as quantidades. O total e a mensagem ficam prontos ao lado para você copiar e colar.</p>
       </div>
-      <div class="orders">
-        <article class="order">
-          <p class="lead-time">48 horas antes</p>
-          <h3>Bolo de aniversário</h3>
-          <p>Massa branca ou chocolate, recheio de brigadeiro, ninho ou doce de leite. Serve 20 pessoas.</p>
-          <p class="price">a partir de R$ 140,00</p>
-        </article>
-        <article class="order">
-          <p class="lead-time">24 horas antes</p>
-          <h3>Salgados para festa</h3>
-          <p>Coxinha, bolinha de queijo, risole e esfiha, fritos ou assados na hora da retirada.</p>
-          <p class="price">R$ 95,00 o cento</p>
-        </article>
-        <article class="order">
-          <p class="lead-time">Até 18h do dia anterior</p>
-          <h3>Cesta de café da manhã</h3>
-          <p>Pães, pão de queijo, bolo, frutas, frios, suco e café para duas pessoas.</p>
-          <p class="price">R$ 120,00</p>
-        </article>
+      <div class="order">
+        <div class="items" id="items"></div>
+        <aside class="summary" aria-live="polite">
+          <p class="eyebrow">Seu pedido</p>
+          <ul id="sum-list"><li><span>Nenhum item ainda</span></li></ul>
+          <label for="delivery"><input type="checkbox" id="delivery"> Entrega no bairro (R$ 10,00, grátis acima de R$ 150,00)</label>
+          <p class="total num" id="sum-total">R$ 0,00</p>
+          <pre id="sum-msg">Adicione pelo menos um item para montar a mensagem.</pre>
+          <button class="btn" type="button" id="copy-order" disabled>Copiar mensagem</button>
+          <p class="small">WhatsApp da padaria: <strong>(11) 90000-1234</strong>. O pedido vale depois da confirmação da loja.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section id="duvidas">
+    <div class="wrap">
+      <div class="head">
+        <p class="eyebrow">Dúvidas frequentes</p>
+        <h2>Antes de passar aqui</h2>
+      </div>
+      <div class="faq">
+        <details><summary>Vocês fazem entrega?</summary><p>Sim, na Vila Mariana e bairros vizinhos, das 7h às 19h, por R$ 10,00. Pedidos acima de R$ 150,00 têm entrega grátis.</p></details>
+        <details><summary>Tem opção sem glúten ou sem lactose?</summary><p>O pão de queijo não leva glúten. Às sextas temos bolo de laranja sem lactose. Como usamos trigo na mesma cozinha, não garantimos ausência de traços.</p></details>
+        <details><summary>Com quanto tempo preciso encomendar um bolo?</summary><p>Bolos de aniversário com 48 horas de antecedência. Salgados para festa com 24 horas. Cestas de café da manhã até as 18h do dia anterior.</p></details>
+        <details><summary>Quais formas de pagamento vocês aceitam?</summary><p>Pix, cartão de débito e crédito, vale-refeição e dinheiro.</p></details>
       </div>
     </div>
   </section>
@@ -258,16 +331,16 @@
   <section id="visite">
     <div class="wrap visit">
       <div>
-        <div class="section-head">
+        <div class="head">
           <p class="eyebrow">Onde estamos</p>
           <h2>Rua das Acácias, 214</h2>
           <p>Vila Mariana, São Paulo. A duas quadras do metrô, com vaga para bicicleta na porta.</p>
         </div>
         <table class="hours">
-          <tbody>
-            <tr><td>Segunda a sexta</td><td>5h30 – 20h00</td></tr>
-            <tr><td>Sábado</td><td>6h00 – 20h00</td></tr>
-            <tr><td>Domingo e feriados</td><td>6h00 – 13h00</td></tr>
+          <tbody id="hours">
+            <tr data-days="1,2,3,4,5"><td>Segunda a sexta</td><td class="num">5h30 – 20h00</td></tr>
+            <tr data-days="6"><td>Sábado</td><td class="num">6h00 – 20h00</td></tr>
+            <tr data-days="0"><td>Domingo e feriados</td><td class="num">6h00 – 13h00</td></tr>
           </tbody>
         </table>
       </div>
@@ -278,7 +351,7 @@
         </div>
         <div>
           <p class="label">Pagamento</p>
-          <p class="value">Pix, cartão de débito e crédito, vale-refeição</p>
+          <p class="value">Pix, cartão, vale-refeição e dinheiro</p>
         </div>
         <div>
           <p class="label">Instagram</p>
@@ -296,44 +369,155 @@
   </div>
 </footer>
 
+<a class="btn fab" href="#encomenda">Encomendar</a>
+
 <script>
   (function () {
-    var items = Array.prototype.slice.call(document.querySelectorAll('#schedule li'));
-    function update() {
-      var now = new Date();
-      var mins = now.getHours() * 60 + now.getMinutes();
-      var next = null;
-      items.forEach(function (li) { li.classList.remove('next'); });
-      for (var i = 0; i < items.length; i++) {
-        var t = (+items[i].dataset.h) * 60 + (+items[i].dataset.m);
-        if (t > mins) { next = items[i]; break; }
+    var brl = function (v) { return 'R$ ' + v.toFixed(2).replace('.', ','); };
+    var css = function (name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); };
+
+    /* ---------- painel de azulejos ---------- */
+    var canvas = document.getElementById('tiles');
+    function drawTiles() {
+      var w = canvas.clientWidth; if (!w) return;
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width = w * dpr; canvas.height = w * dpr;
+      var c = canvas.getContext('2d');
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var blue = css('--azulejo'), soft = css('--azulejo-soft'), paper = css('--surface'), gold = css('--crust');
+      var n = 4, s = w / n;
+      for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) {
+        var ox = x * s, oy = y * s, cx = ox + s / 2, cy = oy + s / 2;
+        c.fillStyle = paper; c.fillRect(ox, oy, s, s);
+        // quartos de círculo nos cantos: juntos formam rosetas entre os azulejos
+        c.fillStyle = blue;
+        [[ox, oy], [ox + s, oy], [ox, oy + s], [ox + s, oy + s]].forEach(function (p) {
+          c.beginPath(); c.arc(p[0], p[1], s * .2, 0, Math.PI * 2); c.fill();
+        });
+        c.fillStyle = paper;
+        [[ox, oy], [ox + s, oy], [ox, oy + s], [ox + s, oy + s]].forEach(function (p) {
+          c.beginPath(); c.arc(p[0], p[1], s * .1, 0, Math.PI * 2); c.fill();
+        });
+        // losango
+        c.fillStyle = soft;
+        c.beginPath(); c.moveTo(cx, oy + s * .12); c.lineTo(ox + s * .88, cy); c.lineTo(cx, oy + s * .88); c.lineTo(ox + s * .12, cy); c.closePath(); c.fill();
+        // flor de oito pétalas
+        c.fillStyle = blue;
+        for (var k = 0; k < 8; k++) {
+          c.save(); c.translate(cx, cy); c.rotate(k * Math.PI / 4);
+          c.beginPath(); c.ellipse(0, -s * .17, s * .055, s * .15, 0, 0, Math.PI * 2); c.fill();
+          c.restore();
+        }
+        c.fillStyle = gold; c.beginPath(); c.arc(cx, cy, s * .07, 0, Math.PI * 2); c.fill();
+        c.fillStyle = paper; c.beginPath(); c.arc(cx, cy, s * .03, 0, Math.PI * 2); c.fill();
+        // rejunte
+        c.strokeStyle = soft; c.lineWidth = 1.5; c.strokeRect(ox + .75, oy + .75, s - 1.5, s - 1.5);
       }
+    }
+    drawTiles();
+    window.addEventListener('resize', drawTiles);
+    try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawTiles); } catch (e) {}
+    new MutationObserver(drawTiles).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    /* ---------- horário: aberto agora, fornadas ---------- */
+    var OPEN = { 0: [360, 780], 1: [330, 1200], 2: [330, 1200], 3: [330, 1200], 4: [330, 1200], 5: [330, 1200], 6: [360, 1200] };
+    var items = Array.prototype.slice.call(document.querySelectorAll('#schedule li'));
+    function tick() {
+      var now = new Date(), day = now.getDay(), mins = now.getHours() * 60 + now.getMinutes();
+      var o = OPEN[day], open = mins >= o[0] && mins < o[1];
+      var st = document.getElementById('status');
+      st.classList.toggle('open', open);
+      var closeH = Math.floor(o[1] / 60) + 'h';
+      document.getElementById('status-text').textContent = open ? 'Aberto até ' + closeH : 'Fechado agora';
+
+      document.querySelectorAll('#hours tr').forEach(function (tr) {
+        tr.classList.toggle('today', tr.dataset.days.split(',').indexOf(String(day)) > -1);
+      });
+
+      var next = null;
+      items.forEach(function (li) {
+        var t = +li.dataset.t;
+        li.classList.remove('next', 'done');
+        var tag = li.querySelector('.tag'); if (tag) tag.remove();
+        if (t <= mins) li.classList.add('done');
+        else if (!next) next = li;
+      });
       var tomorrow = !next;
       if (tomorrow) next = items[0];
       next.classList.add('next');
-      document.getElementById('next-time').textContent = next.querySelector('time').textContent;
-      document.getElementById('next-what').textContent = next.querySelector('span').textContent + (tomorrow ? ' · amanhã' : '');
-      document.getElementById('next-note').textContent = tomorrow
-        ? 'As fornadas de hoje já acabaram. Amanhã abrimos às 5h30.'
-        : 'Chegue 10 minutos antes para pegar o pão ainda quente.';
-    }
-    update();
-    setInterval(update, 60000);
+      var tg = document.createElement('span'); tg.className = 'tag'; tg.textContent = tomorrow ? 'Próxima: amanhã' : 'Próxima fornada';
+      next.appendChild(tg);
+      if (tomorrow) items.forEach(function (li) { li.classList.remove('done'); });
 
+      document.getElementById('next-time').textContent = next.querySelector('time').textContent;
+      document.getElementById('next-what').textContent = next.querySelector('strong').textContent + (tomorrow ? ' · amanhã' : '');
+      var wait = (+next.dataset.t) - mins;
+      document.getElementById('next-note').textContent = tomorrow
+        ? 'As fornadas de hoje acabaram. A primeira de amanhã sai às 6h.'
+        : (wait <= 60 ? 'Sai em ' + wait + ' minutos. Dá tempo de chegar quentinho.' : 'Chegue 10 minutos antes para pegar quentinho.');
+
+      // posição do "agora" na linha do dia (5h às 20h)
+      var pct = Math.max(0, Math.min(1, (mins - 300) / (1200 - 300)));
+      var dot = document.getElementById('now-dot');
+      dot.style.left = (pct * 100) + '%';
+      dot.dataset.label = 'agora, ' + now.getHours() + 'h' + String(now.getMinutes()).padStart(2, '0');
+    }
+    tick();
+    setInterval(tick, 30000);
+
+    /* ---------- encomenda rápida ---------- */
+    var PRODUCTS = [
+      { id: 'bolo', name: 'Bolo de aniversário', desc: 'Serve 20 pessoas. Brigadeiro, ninho ou doce de leite.', meta: '48 horas de antecedência', price: 140, unit: 'bolo' },
+      { id: 'salgados', name: 'Salgados para festa', desc: 'Coxinha, bolinha de queijo, risole e esfiha.', meta: '24 horas de antecedência', price: 95, unit: 'cento' },
+      { id: 'cesta', name: 'Cesta de café da manhã', desc: 'Pães, bolo, frutas, frios, suco e café para duas pessoas.', meta: 'Até 18h do dia anterior', price: 120, unit: 'cesta' },
+      { id: 'pdq', name: 'Pão de queijo congelado', desc: 'Pacote com 30 unidades para assar em casa.', meta: 'Pronta entrega', price: 38, unit: 'pacote' }
+    ];
+    var qty = {};
+    document.getElementById('items').innerHTML = PRODUCTS.map(function (p) {
+      qty[p.id] = 0;
+      return '<article class="item"><div><h3>' + p.name + '</h3><p>' + p.desc + '</p><p class="meta">' + p.meta + ' · ' + brl(p.price) + ' o ' + p.unit + '</p></div>' +
+        '<div class="stepper"><button type="button" data-id="' + p.id + '" data-d="-1" aria-label="Menos ' + p.name + '">−</button><output id="q-' + p.id + '" class="num">0</output><button type="button" data-id="' + p.id + '" data-d="1" aria-label="Mais ' + p.name + '">+</button></div></article>';
+    }).join('');
+    document.getElementById('items').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-id]'); if (!b) return;
+      qty[b.dataset.id] = Math.max(0, Math.min(20, qty[b.dataset.id] + (+b.dataset.d)));
+      renderOrder();
+    });
+    document.getElementById('delivery').addEventListener('change', renderOrder);
+    function renderOrder() {
+      var chosen = PRODUCTS.filter(function (p) { return qty[p.id] > 0; });
+      PRODUCTS.forEach(function (p) { document.getElementById('q-' + p.id).textContent = qty[p.id]; });
+      var delivery = document.getElementById('delivery').checked;
+      var subtotal = chosen.reduce(function (a, p) { return a + p.price * qty[p.id]; }, 0);
+      var fee = chosen.length && delivery ? (subtotal >= 150 ? 0 : 10) : 0;
+      var total = subtotal + fee;
+      document.getElementById('sum-list').innerHTML = chosen.length
+        ? chosen.map(function (p) { return '<li><span>' + qty[p.id] + '× ' + p.name + '</span><span class="num">' + brl(p.price * qty[p.id]) + '</span></li>'; }).join('') +
+          (delivery ? '<li><span>Entrega</span><span class="num">' + (fee ? brl(fee) : 'grátis') + '</span></li>' : '')
+        : '<li><span>Nenhum item ainda</span></li>';
+      document.getElementById('sum-total').textContent = brl(total);
+      document.getElementById('copy-order').disabled = !chosen.length;
+      document.getElementById('sum-msg').textContent = chosen.length
+        ? 'Olá, Trigo & Brasa! Quero encomendar: ' + chosen.map(function (p) { return qty[p.id] + ' ' + p.name.toLowerCase(); }).join(', ') + '. ' + (delivery ? 'Com entrega no bairro. ' : 'Vou retirar na loja. ') + 'Total ' + brl(total) + '.'
+        : 'Adicione pelo menos um item para montar a mensagem.';
+    }
+    renderOrder();
+
+    /* ---------- copiar ---------- */
+    function copyText(btn, el, done) {
+      var original = btn.textContent;
+      function selectIt() {
+        var r = document.createRange(); r.selectNodeContents(el);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        btn.textContent = 'Texto selecionado';
+      }
+      try { navigator.clipboard.writeText(el.textContent).then(function () { btn.textContent = done; }, selectIt); }
+      catch (e) { selectIt(); }
+      setTimeout(function () { btn.textContent = original; }, 2200);
+    }
+    document.getElementById('copy-order').addEventListener('click', function () { copyText(this, document.getElementById('sum-msg'), 'Mensagem copiada'); });
     document.querySelectorAll('.copy').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var el = document.getElementById(btn.dataset.copy);
-        var text = el.textContent;
-        function selectIt() {
-          var r = document.createRange(); r.selectNodeContents(el);
-          var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
-          btn.textContent = 'Selecionado';
-        }
-        try {
-          navigator.clipboard.writeText(text).then(function () { btn.textContent = 'Copiado'; }, selectIt);
-        } catch (e) { selectIt(); }
-        setTimeout(function () { btn.textContent = 'Copiar'; }, 2000);
-      });
+      btn.addEventListener('click', function () { copyText(btn, document.getElementById(btn.dataset.copy), 'Copiado'); });
     });
   })();
 </script>
