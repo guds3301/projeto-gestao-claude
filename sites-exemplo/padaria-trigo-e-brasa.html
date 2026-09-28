@@ -1,0 +1,339 @@
+<title>Padaria Trigo &amp; Brasa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: padaria de bairro com azulejo azul; hero em duas colunas (promessa + próxima fornada), seções empilhadas */
+  :root {
+    --bg: #fbfaf7;
+    --surface: #ffffff;
+    --ink: #1c2233;
+    --muted: #5d6478;
+    --azulejo: #1f4fa3;
+    --azulejo-soft: #e6ecf8;
+    --crust: #b8792a;
+    --line: #dfe3ec;
+    --display: "Young Serif", Georgia, "Times New Roman", serif;
+    --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11151f; --surface: #182031; --ink: #eef1f7; --muted: #a3abc0;
+      --azulejo: #8fb0ee; --azulejo-soft: #1d2a45; --crust: #e0a458; --line: #2a3448;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11151f; --surface: #182031; --ink: #eef1f7; --muted: #a3abc0;
+    --azulejo: #8fb0ee; --azulejo-soft: #1d2a45; --crust: #e0a458; --line: #2a3448;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.15; text-wrap: balance; margin: 0; }
+  h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); }
+  p { margin: 0; }
+  a { color: var(--azulejo); }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--crust); outline-offset: 3px; border-radius: 4px; }
+  .eyebrow { font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--crust); }
+
+  /* faixa de azulejo feita só com CSS */
+  .tiles {
+    height: 28px;
+    background-color: var(--azulejo-soft);
+    background-image:
+      radial-gradient(circle at 50% 50%, var(--azulejo) 0 3px, transparent 4px),
+      conic-gradient(from 45deg, var(--azulejo) 0 25%, transparent 0 50%, var(--azulejo) 0 75%, transparent 0);
+    background-size: 28px 28px, 14px 14px;
+    background-position: 0 0, 7px 7px;
+    opacity: .9;
+  }
+
+  header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; flex-wrap: wrap; }
+  .brand { font-family: var(--display); font-size: 1.4rem; color: var(--ink); text-decoration: none; }
+  .brand span { color: var(--crust); }
+  .nav ul { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; flex-wrap: wrap; }
+  .nav ul a { color: var(--muted); text-decoration: none; font-weight: 500; font-size: .95rem; }
+  .nav ul a:hover { color: var(--ink); }
+  .btn { display: inline-block; background: var(--azulejo); color: var(--bg); padding: 12px 20px; border-radius: 999px; font-weight: 600; text-decoration: none; border: 0; font: inherit; font-weight: 600; cursor: pointer; }
+  .btn:hover { filter: brightness(1.1); }
+  .btn.ghost { background: transparent; color: var(--azulejo); box-shadow: inset 0 0 0 2px var(--azulejo); }
+
+  .hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 48px; align-items: center; padding-block: 64px 56px; }
+  .hero > * { min-width: 0; }
+  .hero h1 { font-size: clamp(2.4rem, 6vw, 3.8rem); margin-block: 12px 18px; }
+  .hero p.lead { font-size: 1.15rem; color: var(--muted); max-width: 34em; }
+  .hero .ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+
+  .oven { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+  .oven .tiles { height: 18px; background-size: 18px 18px, 9px 9px; background-position: 0 0, 4.5px 4.5px; }
+  .oven-body { padding: 24px; display: grid; gap: 6px; }
+  .oven-time { font-family: var(--display); font-size: 3.2rem; line-height: 1; color: var(--azulejo); font-variant-numeric: tabular-nums; }
+  .oven-what { font-size: 1.15rem; font-weight: 600; }
+  .oven-note { color: var(--muted); font-size: .92rem; }
+
+  section { padding-block: 64px; border-top: 1px solid var(--line); }
+  .section-head { display: grid; gap: 8px; margin-bottom: 32px; max-width: 40em; }
+  .section-head p { color: var(--muted); }
+
+  /* horário das fornadas: sequência real do dia */
+  .schedule { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .schedule li { border-top: 3px solid var(--line); padding-top: 12px; display: grid; gap: 2px; }
+  .schedule li.next { border-top-color: var(--crust); }
+  .schedule time { font-family: var(--display); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+  .schedule span { color: var(--muted); font-size: .95rem; }
+  .schedule li.next span::after { content: " · próxima"; color: var(--crust); font-weight: 600; }
+
+  .menu { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 56px; }
+  .menu h3 { font-size: 1.35rem; margin-bottom: 12px; }
+  .menu dl { margin: 0; display: grid; gap: 10px; }
+  .menu .row { display: flex; align-items: baseline; gap: 10px; }
+  .menu dt { font-weight: 500; }
+  .menu dt small { display: block; color: var(--muted); font-weight: 400; font-size: .88rem; }
+  .menu .dots { flex: 1; border-bottom: 1px dotted var(--muted); opacity: .5; transform: translateY(-4px); min-width: 16px; }
+  .menu dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+
+  .orders { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .order { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; display: grid; gap: 8px; align-content: start; }
+  .order h3 { font-size: 1.25rem; }
+  .order .price { font-weight: 700; color: var(--azulejo); font-variant-numeric: tabular-nums; }
+  .order p { color: var(--muted); font-size: .95rem; }
+  .order .lead-time { font-size: .82rem; font-weight: 600; color: var(--crust); letter-spacing: .04em; text-transform: uppercase; }
+
+  .visit { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .visit > * { min-width: 0; }
+  .hours { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .hours td { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .hours td:last-child { text-align: right; font-weight: 600; }
+  .contact { display: grid; gap: 18px; }
+  .contact .label { font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .contact .value { font-size: 1.1rem; }
+  .copy { font: inherit; font-size: .85rem; margin-left: 8px; background: var(--azulejo-soft); color: var(--azulejo); border: 0; border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+
+  footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: .9rem; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+  @media (max-width: 860px) {
+    .hero, .visit { grid-template-columns: 1fr; gap: 32px; }
+    .schedule { grid-template-columns: repeat(2, 1fr); }
+    .menu, .orders { grid-template-columns: 1fr; }
+    .nav ul { display: none; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .oven-time { transition: color .3s; }
+  }
+</style>
+
+<header class="top">
+  <div class="wrap nav">
+    <a class="brand" href="#inicio">Trigo <span>&amp;</span> Brasa</a>
+    <ul>
+      <li><a href="#fornadas">Fornadas</a></li>
+      <li><a href="#cardapio">Cardápio</a></li>
+      <li><a href="#encomendas">Encomendas</a></li>
+      <li><a href="#visite">Onde estamos</a></li>
+    </ul>
+    <a class="btn" href="#encomendas">Fazer encomenda</a>
+  </div>
+</header>
+
+<main id="inicio">
+  <div class="tiles" aria-hidden="true"></div>
+  <div class="wrap hero">
+    <div>
+      <p class="eyebrow">Padaria de bairro · Vila Mariana · desde 1987</p>
+      <h1>Pão quente saindo do forno cinco vezes por dia.</h1>
+      <p class="lead">Pão francês com casca que estala, pão de queijo de polvilho azedo e bolo do dia feito de manhã. Receitas da família Almeida, forno a lenha no fundo da loja.</p>
+      <div class="ctas">
+        <a class="btn" href="#cardapio">Ver cardápio e preços</a>
+        <a class="btn ghost" href="#visite">Como chegar</a>
+      </div>
+    </div>
+    <aside class="oven" aria-live="polite">
+      <div class="tiles" aria-hidden="true"></div>
+      <div class="oven-body">
+        <p class="eyebrow">Próxima fornada</p>
+        <p class="oven-time" id="next-time">10h00</p>
+        <p class="oven-what" id="next-what">Pão francês</p>
+        <p class="oven-note" id="next-note">Chegue 10 minutos antes para pegar o pão ainda quente.</p>
+      </div>
+    </aside>
+  </div>
+
+  <section id="fornadas">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Horário das fornadas</p>
+        <h2>Saiba a hora certa de passar aqui</h2>
+        <p>Assamos em pequenas quantidades ao longo do dia, então o pão da tarde é tão fresco quanto o da manhã.</p>
+      </div>
+      <ol class="schedule" id="schedule">
+        <li data-h="6" data-m="0"><time>6h00</time><span>Pão francês</span></li>
+        <li data-h="7" data-m="30"><time>7h30</time><span>Pão de queijo</span></li>
+        <li data-h="10" data-m="0"><time>10h00</time><span>Pão francês</span></li>
+        <li data-h="15" data-m="30"><time>15h30</time><span>Bolos do dia</span></li>
+        <li data-h="17" data-m="0"><time>17h00</time><span>Pão francês</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="cardapio">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Cardápio</p>
+        <h2>Do balcão para a sua mesa</h2>
+      </div>
+      <div class="menu">
+        <div>
+          <h3>Pães</h3>
+          <dl>
+            <div class="row"><dt>Pão francês<small>vendido por peso</small></dt><span class="dots"></span><dd>R$ 18,90/kg</dd></div>
+            <div class="row"><dt>Fermentação natural<small>48 horas de fermentação, 800 g</small></dt><span class="dots"></span><dd>R$ 26,00</dd></div>
+            <div class="row"><dt>Pão de queijo<small>polvilho azedo e queijo canastra</small></dt><span class="dots"></span><dd>R$ 4,50</dd></div>
+            <div class="row"><dt>Pão de milho</dt><span class="dots"></span><dd>R$ 14,00</dd></div>
+          </dl>
+        </div>
+        <div>
+          <h3>Doces</h3>
+          <dl>
+            <div class="row"><dt>Sonho de creme</dt><span class="dots"></span><dd>R$ 7,00</dd></div>
+            <div class="row"><dt>Bolo de fubá com goiabada<small>fatia</small></dt><span class="dots"></span><dd>R$ 8,00</dd></div>
+            <div class="row"><dt>Bolo de fubá com goiabada<small>inteiro, 1,2 kg</small></dt><span class="dots"></span><dd>R$ 42,00</dd></div>
+            <div class="row"><dt>Carolina de doce de leite</dt><span class="dots"></span><dd>R$ 5,50</dd></div>
+          </dl>
+        </div>
+        <div>
+          <h3>Salgados</h3>
+          <dl>
+            <div class="row"><dt>Coxinha de frango com catupiry</dt><span class="dots"></span><dd>R$ 8,50</dd></div>
+            <div class="row"><dt>Esfiha de carne</dt><span class="dots"></span><dd>R$ 7,00</dd></div>
+            <div class="row"><dt>Misto quente na chapa</dt><span class="dots"></span><dd>R$ 12,00</dd></div>
+          </dl>
+        </div>
+        <div>
+          <h3>Bebidas</h3>
+          <dl>
+            <div class="row"><dt>Café coado</dt><span class="dots"></span><dd>R$ 5,00</dd></div>
+            <div class="row"><dt>Pingado</dt><span class="dots"></span><dd>R$ 6,50</dd></div>
+            <div class="row"><dt>Suco de laranja<small>espremido na hora, 400 ml</small></dt><span class="dots"></span><dd>R$ 10,00</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="encomendas">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Encomendas</p>
+        <h2>Festas, reuniões e café da manhã</h2>
+        <p>Peça pelo WhatsApp com a antecedência indicada. Retirada na loja ou entrega no bairro por R$ 10,00.</p>
+      </div>
+      <div class="orders">
+        <article class="order">
+          <p class="lead-time">48 horas antes</p>
+          <h3>Bolo de aniversário</h3>
+          <p>Massa branca ou chocolate, recheio de brigadeiro, ninho ou doce de leite. Serve 20 pessoas.</p>
+          <p class="price">a partir de R$ 140,00</p>
+        </article>
+        <article class="order">
+          <p class="lead-time">24 horas antes</p>
+          <h3>Salgados para festa</h3>
+          <p>Coxinha, bolinha de queijo, risole e esfiha, fritos ou assados na hora da retirada.</p>
+          <p class="price">R$ 95,00 o cento</p>
+        </article>
+        <article class="order">
+          <p class="lead-time">Até 18h do dia anterior</p>
+          <h3>Cesta de café da manhã</h3>
+          <p>Pães, pão de queijo, bolo, frutas, frios, suco e café para duas pessoas.</p>
+          <p class="price">R$ 120,00</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="visite">
+    <div class="wrap visit">
+      <div>
+        <div class="section-head">
+          <p class="eyebrow">Onde estamos</p>
+          <h2>Rua das Acácias, 214</h2>
+          <p>Vila Mariana, São Paulo. A duas quadras do metrô, com vaga para bicicleta na porta.</p>
+        </div>
+        <table class="hours">
+          <tbody>
+            <tr><td>Segunda a sexta</td><td>5h30 – 20h00</td></tr>
+            <tr><td>Sábado</td><td>6h00 – 20h00</td></tr>
+            <tr><td>Domingo e feriados</td><td>6h00 – 13h00</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="contact">
+        <div>
+          <p class="label">WhatsApp para encomendas</p>
+          <p class="value"><span id="phone">(11) 90000-1234</span><button class="copy" type="button" data-copy="phone">Copiar</button></p>
+        </div>
+        <div>
+          <p class="label">Pagamento</p>
+          <p class="value">Pix, cartão de débito e crédito, vale-refeição</p>
+        </div>
+        <div>
+          <p class="label">Instagram</p>
+          <p class="value">@trigoebrasa</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>© Padaria Trigo &amp; Brasa</p>
+    <p>Site de demonstração: negócio fictício criado como exemplo de portfólio.</p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var items = Array.prototype.slice.call(document.querySelectorAll('#schedule li'));
+    function update() {
+      var now = new Date();
+      var mins = now.getHours() * 60 + now.getMinutes();
+      var next = null;
+      items.forEach(function (li) { li.classList.remove('next'); });
+      for (var i = 0; i < items.length; i++) {
+        var t = (+items[i].dataset.h) * 60 + (+items[i].dataset.m);
+        if (t > mins) { next = items[i]; break; }
+      }
+      var tomorrow = !next;
+      if (tomorrow) next = items[0];
+      next.classList.add('next');
+      document.getElementById('next-time').textContent = next.querySelector('time').textContent;
+      document.getElementById('next-what').textContent = next.querySelector('span').textContent + (tomorrow ? ' · amanhã' : '');
+      document.getElementById('next-note').textContent = tomorrow
+        ? 'As fornadas de hoje já acabaram. Amanhã abrimos às 5h30.'
+        : 'Chegue 10 minutos antes para pegar o pão ainda quente.';
+    }
+    update();
+    setInterval(update, 60000);
+
+    document.querySelectorAll('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var el = document.getElementById(btn.dataset.copy);
+        var text = el.textContent;
+        function selectIt() {
+          var r = document.createRange(); r.selectNodeContents(el);
+          var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+          btn.textContent = 'Selecionado';
+        }
+        try {
+          navigator.clipboard.writeText(text).then(function () { btn.textContent = 'Copiado'; }, selectIt);
+        } catch (e) { selectIt(); }
+        setTimeout(function () { btn.textContent = 'Copiar'; }, 2000);
+      });
+    });
+  })();
+</script>
