@@ -1,8 +1,15 @@
 <title>Padaria Trigo &amp; Brasa</title>
 <meta name="description" content="Padaria de bairro na Vila Mariana com forno a lenha. Pão francês cinco vezes por dia, encomendas de bolos e salgados.">
+<meta name="theme-color" content="#22201c">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Padaria Trigo &amp; Brasa">
+<meta property="og:description" content="Do forno a lenha direto pra sua mesa. Cinco fornadas por dia na Vila Mariana.">
+<meta property="og:image" content="img/padaria-forno.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Onest:wght@400;500;600;700&display=swap">
+<link rel="preload" as="image" href="img/padaria-forno.jpg" fetchpriority="high">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -22,6 +29,7 @@
     --ink: #22201c;
     --muted: #6b675e;
     --mustard: #d69e17;
+    --mustard-text: #8a6200; /* mostarda legível sobre papel claro */
     --mustard-ink: #22201c;
     --charcoal: #22201c;
     --on-charcoal: #f4f3ef;
@@ -33,13 +41,13 @@
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #171613; --surface: #211f1b; --ink: #f1eee6; --muted: #aaa497;
-      --mustard: #e8b43a; --charcoal: #0e0d0b; --line: #33302a; --ok: #6fcf97;
+      --mustard: #e8b43a; --mustard-text: #e8b43a; --charcoal: #0e0d0b; --line: #33302a; --ok: #6fcf97;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
     --bg: #171613; --surface: #211f1b; --ink: #f1eee6; --muted: #aaa497;
-    --mustard: #e8b43a; --charcoal: #0e0d0b; --line: #33302a; --ok: #6fcf97;
+    --mustard: #e8b43a; --mustard-text: #e8b43a; --charcoal: #0e0d0b; --line: #33302a; --ok: #6fcf97;
     color-scheme: dark;
   }
 
@@ -54,7 +62,8 @@
   table { color: inherit; font: inherit; }
   a { color: inherit; }
   :focus-visible { outline: 3px solid var(--mustard); outline-offset: 3px; border-radius: 4px; }
-  .kicker { font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mustard); }
+  .kicker { font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mustard-text); }
+  .dark .kicker, .hero .kicker, .summary .kicker { color: var(--mustard); }
   .num { font-variant-numeric: tabular-nums; }
 
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--mustard); color: var(--mustard-ink); padding: 14px 24px; border-radius: 6px; font: inherit; font-weight: 700; text-decoration: none; border: 0; cursor: pointer; }
@@ -62,32 +71,62 @@
   .btn.ghost { background: transparent; color: #fff; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .7); }
   .btn:disabled { opacity: .45; cursor: not-allowed; }
 
-  /* hero em tela cheia com foto */
-  .hero { position: relative; color: #fff; background: #1b1a17 url("img/padaria-forno.jpg") center 40% / cover no-repeat; }
-  .hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(20, 17, 12, .88) 0%, rgba(20, 17, 12, .6) 45%, rgba(20, 17, 12, .1) 100%); }
-  .hero > * { position: relative; }
-  .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; }
+  /* pular para o conteúdo */
+  .skip { position: absolute; left: 12px; top: -80px; z-index: 60; background: var(--mustard); color: var(--mustard-ink); padding: 12px 18px; border-radius: 6px; font-weight: 700; text-decoration: none; transition: top .16s; }
+  .skip:focus { top: calc(env(safe-area-inset-top, 0px) + 12px); }
+
+  /* cabeçalho fixo: transparente sobre o hero, sólido depois dele */
+  .bar { position: fixed; top: 0; left: 0; right: 0; z-index: 50; padding-top: env(safe-area-inset-top, 0px); color: #fff; transition: background-color .3s, box-shadow .3s, color .3s; }
+  .bar.stuck { background: color-mix(in srgb, var(--charcoal) 94%, transparent); backdrop-filter: blur(10px); box-shadow: 0 1px 0 rgba(255, 255, 255, .12); }
+  .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
   .brand { font-family: var(--display); font-size: 1.6rem; color: #fff; text-decoration: none; white-space: nowrap; }
   .brand span { color: var(--mustard); }
-  .nav ul { display: flex; gap: 26px; list-style: none; margin: 0; padding: 0; }
-  .nav ul a { color: rgba(255, 255, 255, .8); text-decoration: none; font-weight: 500; }
-  .nav ul a:hover { color: #fff; }
-  .status { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 600; color: rgba(255, 255, 255, .8); white-space: nowrap; background: rgba(0, 0, 0, .35); padding: 6px 12px; border-radius: 999px; }
-  .status i { width: 8px; height: 8px; border-radius: 50%; background: #bbb; }
+  .menu { display: flex; gap: 8px; list-style: none; margin: 0; padding: 0; }
+  .menu a { color: rgba(255, 255, 255, .82); text-decoration: none; font-weight: 500; display: block; padding: 12px 10px; border-radius: 6px; }
+  .menu a:hover { color: #fff; background: rgba(255, 255, 255, .1); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .status { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 600; color: rgba(255, 255, 255, .85); white-space: nowrap; background: rgba(0, 0, 0, .4); padding: 8px 14px; border-radius: 999px; }
+  .status i { width: 8px; height: 8px; border-radius: 50%; background: #bbb; flex: none; }
   .status.open i { background: #5ee08e; box-shadow: 0 0 0 4px rgba(94, 224, 142, .25); }
-  .hero-body { padding-block: 88px 104px; max-width: 640px; display: grid; gap: 22px; }
+  .burger { display: none; align-items: center; gap: 8px; min-height: 44px; padding: 10px 16px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .45); background: rgba(0, 0, 0, .35); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+  .burger b { display: grid; gap: 4px; }
+  .burger b i { display: block; width: 18px; height: 2px; background: currentColor; transition: transform .2s, opacity .2s; }
+  .burger[aria-expanded="true"] b i:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .burger[aria-expanded="true"] b i:nth-child(2) { opacity: 0; }
+  .burger[aria-expanded="true"] b i:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+  .drawer { display: none; }
+  .drawer[data-open] { display: grid; }
+  .drawer { position: fixed; inset: 0; z-index: 55; background: var(--charcoal); color: var(--on-charcoal); padding: calc(env(safe-area-inset-top, 0px) + 84px) 24px calc(env(safe-area-inset-bottom, 0px) + 32px); align-content: start; gap: 4px; overflow-y: auto; }
+  .drawer a { font-family: var(--display); font-size: 2.2rem; text-decoration: none; padding-block: 14px; border-bottom: 1px solid rgba(244, 243, 239, .15); }
+  .drawer .btn { margin-top: 24px; }
+
+  /* hero em tela cheia com foto */
+  .hero { position: relative; color: #fff; background: #1b1a17; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; background: url("img/padaria-forno.jpg") center 40% / cover no-repeat; transform: scale(1.06); animation: settle 1.4s cubic-bezier(.16, .84, .44, 1) forwards; }
+  @keyframes settle { to { transform: scale(1); } }
+  .hero::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgba(20, 17, 12, .9) 0%, rgba(20, 17, 12, .62) 45%, rgba(20, 17, 12, .12) 100%); }
+  .hero > .wrap { position: relative; z-index: 2; }
+  .hero-body { padding-block: 152px 112px; max-width: 660px; display: grid; gap: 22px; }
   .hero h1 { font-size: clamp(3rem, 8vw, 5.6rem); }
   .hero h1 em { font-style: normal; color: var(--mustard); }
-  .hero .lead { font-size: 1.18rem; color: rgba(255, 255, 255, .85); max-width: 32em; }
+  .hero .lead { font-size: 1.18rem; color: rgba(255, 255, 255, .88); max-width: 32em; }
   .hero .ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  /* entrada escalonada: começa visível e só desliza, nunca fica preso em opacity 0 */
+  .hero-body > * { animation: rise .7s cubic-bezier(.16, .84, .44, 1) backwards; }
+  .hero-body > :nth-child(1) { animation-delay: .05s; }
+  .hero-body > :nth-child(2) { animation-delay: .14s; }
+  .hero-body > :nth-child(3) { animation-delay: .26s; }
+  .hero-body > :nth-child(4) { animation-delay: .38s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(18px); } }
 
-  /* faixa da próxima fornada */
-  .batch { background: var(--mustard); color: var(--mustard-ink); }
-  .batch .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; padding-block: 16px; }
+  /* faixa da próxima fornada, com barra de contagem */
+  .batch { background: var(--mustard); color: var(--mustard-ink); position: relative; overflow: hidden; }
+  .batch .wrap { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 28px; padding-block: 16px; }
   .batch .label { font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
   .batch .time { font-family: var(--display); font-size: 2rem; line-height: 1; }
   .batch .what { font-weight: 700; font-size: 1.1rem; }
   .batch .note { font-size: .95rem; }
+  .batch .bar-progress { position: absolute; left: 0; bottom: 0; height: 4px; width: 0; background: var(--charcoal); transition: width .6s ease; }
 
   section { padding-block: 88px; }
   .head { display: grid; gap: 12px; margin-bottom: 40px; max-width: 44em; }
@@ -119,7 +158,8 @@
 
   /* cardápio com abas */
   .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
-  .tabs button { font: inherit; font-weight: 600; padding: 10px 18px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .tabs button { font: inherit; font-weight: 600; min-height: 44px; padding: 10px 20px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; transition: background-color .15s, color .15s, border-color .15s; }
+  .tabs button:hover { border-color: var(--ink); }
   .tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
   .menu-panel { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .dish { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; }
@@ -136,19 +176,19 @@
   .item { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: grid; gap: 8px; align-content: start; }
   .item h3 { font-size: 1.4rem; }
   .item p { color: var(--muted); font-size: .92rem; }
-  .item .meta { font-size: .8rem; font-weight: 700; color: var(--mustard); letter-spacing: .02em; }
+  .item .meta { font-size: .8rem; font-weight: 700; color: var(--mustard-text); letter-spacing: .02em; }
   .item .foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 6px; }
   .item .price { font-weight: 700; }
   .stepper { display: flex; align-items: center; gap: 4px; }
-  .stepper button { width: 36px; height: 36px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 1.2rem; line-height: 1; cursor: pointer; }
-  .stepper button:hover { border-color: var(--ink); }
+  .stepper button { width: 44px; height: 44px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 1.2rem; line-height: 1; cursor: pointer; transition: border-color .15s, background-color .15s; }
+  .stepper button:hover { border-color: var(--ink); background: var(--surface); }
   .stepper output { min-width: 30px; text-align: center; font-weight: 700; }
   .summary { background: var(--charcoal); color: var(--on-charcoal); border-radius: 8px; padding: 26px; display: grid; gap: 14px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); }
   .summary ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: .95rem; }
   .summary li { display: flex; justify-content: space-between; gap: 12px; }
   .summary .total { font-family: var(--display); font-size: 2.8rem; line-height: 1; color: var(--mustard); }
-  .summary label { display: flex; align-items: flex-start; gap: 10px; font-size: .92rem; cursor: pointer; }
-  .summary input[type="checkbox"] { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--mustard); }
+  .summary label { display: flex; align-items: flex-start; gap: 12px; font-size: .92rem; cursor: pointer; min-height: 44px; padding-block: 8px; }
+  .summary input[type="checkbox"] { width: 22px; height: 22px; margin-top: 1px; flex: none; accent-color: var(--mustard); }
   .summary pre { white-space: pre-wrap; margin: 0; font: inherit; font-size: .88rem; background: rgba(255, 255, 255, .07); border-radius: 6px; padding: 12px; }
   .summary .small { font-size: .82rem; color: rgba(244, 243, 239, .65); }
 
@@ -172,11 +212,14 @@
   .contact { display: grid; gap: 22px; align-content: start; }
   .contact .label { font-size: .76rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(244, 243, 239, .6); }
   .contact .value { font-size: 1.15rem; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-  .copy { font: inherit; font-size: .82rem; font-weight: 600; background: var(--mustard); color: var(--mustard-ink); border: 0; border-radius: 4px; padding: 4px 12px; cursor: pointer; }
+  .copy { font: inherit; font-size: .85rem; font-weight: 700; background: var(--mustard); color: var(--mustard-ink); border: 0; border-radius: 6px; padding: 10px 16px; min-height: 44px; cursor: pointer; }
+  .copy:hover { filter: brightness(1.08); }
 
   footer { background: var(--charcoal); color: rgba(244, 243, 239, .6); border-top: 1px solid rgba(244, 243, 239, .12); padding-block: 24px 96px; font-size: .9rem; }
   footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .fab { position: fixed; right: 20px; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); z-index: 20; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .5); }
+  .fab { position: fixed; right: 20px; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); z-index: 20; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .5); transition: opacity .25s, transform .25s; }
+  .fab[data-hidden] { opacity: 0; transform: translateY(14px); pointer-events: none; }
+
 
   @media (max-width: 900px) {
     .story, .visit, .order { grid-template-columns: 1fr; gap: 40px; }
@@ -184,24 +227,61 @@
     .clock li, .clock li:first-child { padding: 18px 0; border-right: 0; border-bottom: 1px solid rgba(244, 243, 239, .12); }
     .clock li:nth-child(odd) { padding-right: 16px; }
     .menu-panel, .items { grid-template-columns: 1fr; }
-    .nav ul { display: none; }
     .summary { position: static; }
-    .hero::before { background: linear-gradient(180deg, rgba(20, 17, 12, .55) 0%, rgba(20, 17, 12, .85) 100%); }
-    .hero-body { padding-block: 56px 72px; }
+    .hero::before { background: linear-gradient(180deg, rgba(20, 17, 12, .6) 0%, rgba(20, 17, 12, .88) 100%); }
+    .hero-body { padding-block: 132px 76px; }
+    .batch .wrap { padding-block: 14px 18px; }
+  }
+  @media (max-width: 860px) {
+    .brand { display: inline-flex; align-items: center; min-height: 44px; }
+    .menu { display: none; }
+    .burger { display: inline-flex; }
+    .status { display: none; }
+  }
+  @media (max-width: 420px) { .brand { padding-block: 6px; font-size: 1.35rem; } }
+
+  /* movimento reduzido: nada se move */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg, .hero-body > *:nth-child(n) { animation: none !important; opacity: 1; transform: none; }
+    .batch .bar-progress, .fab, .tabs button, .btn { transition: none; }
   }
 </style>
 
-<header class="hero" id="inicio">
+<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+
+<div class="bar" id="bar">
   <div class="wrap nav">
     <a class="brand" href="#inicio">Trigo <span>&amp;</span> Brasa</a>
-    <ul>
-      <li><a href="#fornadas">Fornadas</a></li>
-      <li><a href="#cardapio">Cardápio</a></li>
-      <li><a href="#encomenda">Encomendas</a></li>
-      <li><a href="#visite">Onde estamos</a></li>
-    </ul>
-    <p class="status" id="status"><i></i><span id="status-text">…</span></p>
+    <nav aria-label="Principal">
+      <ul class="menu">
+        <li><a href="#fornadas">Fornadas</a></li>
+        <li><a href="#cardapio">Cardápio</a></li>
+        <li><a href="#encomenda">Encomendas</a></li>
+        <li><a href="#visite">Onde estamos</a></li>
+      </ul>
+    </nav>
+    <div class="nav-right">
+      <p class="status" id="status"><i></i><span id="status-text">…</span></p>
+      <button class="burger" type="button" id="burger" aria-expanded="false" aria-controls="drawer">
+        <b aria-hidden="true"><i></i><i></i><i></i></b>Menu
+      </button>
+    </div>
   </div>
+</div>
+
+<div class="drawer" id="drawer" hidden>
+  <nav aria-label="Menu do celular" style="display:grid">
+    <a href="#fornadas">Fornadas</a>
+    <a href="#cardapio">Cardápio</a>
+    <a href="#encomenda">Encomendas</a>
+    <a href="#visite">Onde estamos</a>
+  </nav>
+  <p class="status" id="status-drawer" style="justify-self:start;margin-top:24px"><i></i><span>…</span></p>
+  <a class="btn" href="#encomenda">Montar encomenda</a>
+</div>
+
+<header class="hero" id="inicio">
+  <div class="hero-bg" aria-hidden="true"></div>
   <div class="wrap hero-body">
     <p class="kicker">Padaria de bairro · Vila Mariana · desde 1987</p>
     <h1>Do forno a lenha <em>direto</em> pra sua mesa.</h1>
@@ -220,12 +300,13 @@
     <p class="what" id="next-what">Pão francês</p>
     <p class="note" id="next-note">Chegue 10 minutos antes para pegar quentinho.</p>
   </div>
+  <div class="bar-progress" id="batch-progress" aria-hidden="true"></div>
 </div>
 
-<main>
+<main id="conteudo">
   <section>
     <div class="wrap story">
-      <img src="img/padaria-mesa.jpg" alt="Cesta de pão de queijo, sonhos, bolo de fubá com goiabada e café sobre mesa de madeira" width="1152" height="864">
+      <img src="img/padaria-mesa.jpg" alt="Cesta de pão de queijo, sonhos, bolo de fubá com goiabada e café sobre mesa de madeira" width="1152" height="864" loading="lazy" decoding="async">
       <div class="text">
         <p class="kicker">A casa</p>
         <h2>Café da manhã de padaria de verdade</h2>
@@ -349,7 +430,47 @@
 
 <script>
   (function () {
+    document.documentElement.lang = 'pt-BR';
     var brl = function (v) { return 'R$ ' + v.toFixed(2).replace('.', ','); };
+
+    /* ---------- cabeçalho fixo e menu do celular ---------- */
+    var bar = document.getElementById('bar');
+    var hero = document.getElementById('inicio');
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) {
+        bar.classList.toggle('stuck', !es[0].isIntersecting);
+      }, { rootMargin: '-72px 0px 0px 0px' }).observe(hero);
+    } else { bar.classList.add('stuck'); }
+
+    var burger = document.getElementById('burger'), drawer = document.getElementById('drawer');
+    function setMenu(open) {
+      burger.setAttribute('aria-expanded', String(open));
+      drawer.hidden = !open;
+      if (open) drawer.setAttribute('data-open', ''); else drawer.removeAttribute('data-open');
+      document.body.style.overflow = open ? 'hidden' : '';
+      if (open) { var a = drawer.querySelector('a'); if (a) a.focus(); } else { burger.focus(); }
+    }
+    burger.addEventListener('click', function () { setMenu(burger.getAttribute('aria-expanded') !== 'true'); });
+    drawer.addEventListener('click', function (e) { if (e.target.closest('a')) setMenu(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && burger.getAttribute('aria-expanded') === 'true') setMenu(false);
+    });
+    // fecha ao voltar para o desktop
+    matchMedia('(min-width: 861px)').addEventListener('change', function (m) {
+      if (m.matches && burger.getAttribute('aria-expanded') === 'true') setMenu(false);
+    });
+
+    /* ---------- botão flutuante: some quando a encomenda está à vista ---------- */
+    var fab = document.querySelector('.fab');
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (es) {
+        var showing = es.some(function (e) { return e.isIntersecting; });
+        if (showing) fab.setAttribute('data-hidden', ''); else fab.removeAttribute('data-hidden');
+      }, { threshold: .12 });
+      io.observe(hero);
+      io.observe(document.getElementById('encomenda'));
+      fab.setAttribute('data-hidden', '');
+    }
 
     /* ---------- horário: aberto agora e fornadas ---------- */
     var OPEN = { 0: [360, 780], 1: [330, 1200], 2: [330, 1200], 3: [330, 1200], 4: [330, 1200], 5: [330, 1200], 6: [360, 1200] };
@@ -357,8 +478,12 @@
     function tick() {
       var now = new Date(), day = now.getDay(), mins = now.getHours() * 60 + now.getMinutes();
       var o = OPEN[day], open = mins >= o[0] && mins < o[1];
-      document.getElementById('status').classList.toggle('open', open);
-      document.getElementById('status-text').textContent = open ? 'Aberto até ' + Math.floor(o[1] / 60) + 'h' : 'Fechado agora';
+      var label = open ? 'Aberto até ' + Math.floor(o[1] / 60) + 'h' : 'Fechado agora';
+      ['status', 'status-drawer'].forEach(function (id) {
+        var el = document.getElementById(id); if (!el) return;
+        el.classList.toggle('open', open);
+        el.querySelector('span').textContent = label;
+      });
       document.querySelectorAll('#hours tr').forEach(function (tr) {
         tr.classList.toggle('today', tr.dataset.days.split(',').indexOf(String(day)) > -1);
       });
@@ -382,6 +507,13 @@
       document.getElementById('next-note').textContent = tomorrow
         ? 'As fornadas de hoje acabaram. A primeira de amanhã sai às 6h.'
         : (wait <= 60 ? 'Sai em ' + wait + ' minutos. Dá tempo de chegar quentinho.' : 'Chegue 10 minutos antes para pegar quentinho.');
+
+      // barra: o quanto já passou desde a fornada anterior até a próxima
+      var prev = null;
+      items.forEach(function (li) { if (+li.dataset.t <= mins) prev = +li.dataset.t; });
+      var start = prev === null ? 300 : prev, end = tomorrow ? 1440 : (+next.dataset.t);
+      var pct = end > start ? Math.max(0, Math.min(1, (mins - start) / (end - start))) : 0;
+      document.getElementById('batch-progress').style.width = (pct * 100).toFixed(1) + '%';
     }
     tick();
     setInterval(tick, 30000);
@@ -414,16 +546,32 @@
       ]
     };
     var tabs = document.getElementById('tabs'), menu = document.getElementById('menu');
-    tabs.innerHTML = Object.keys(MENU).map(function (k, i) {
-      return '<button type="button" role="tab" id="tab-' + i + '" aria-selected="' + (i === 0) + '" data-k="' + k + '">' + k + '</button>';
+    var keys = Object.keys(MENU);
+    tabs.setAttribute('aria-label', 'Categorias do cardápio');
+    tabs.innerHTML = keys.map(function (k, i) {
+      return '<button type="button" role="tab" id="tab-' + i + '" aria-controls="menu" aria-selected="' + (i === 0) + '" tabindex="' + (i === 0 ? 0 : -1) + '" data-k="' + k + '">' + k + '</button>';
     }).join('');
-    function showTab(k) {
-      tabs.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.k === k)); });
+    menu.setAttribute('aria-labelledby', 'tab-0');
+    function showTab(k, focus) {
+      tabs.querySelectorAll('button').forEach(function (b, i) {
+        var on = b.dataset.k === k;
+        b.setAttribute('aria-selected', String(on));
+        b.tabIndex = on ? 0 : -1;
+        if (on) { menu.setAttribute('aria-labelledby', 'tab-' + i); if (focus) b.focus(); }
+      });
       menu.innerHTML = MENU[k].map(function (d) {
         return '<article class="dish"><div><h3>' + d[0] + (d[3] ? '<span class="badge">' + d[3] + '</span>' : '') + '</h3><p>' + d[1] + '</p></div><p class="price num">' + d[2] + '</p></article>';
       }).join('');
     }
     tabs.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) showTab(b.dataset.k); });
+    tabs.addEventListener('keydown', function (e) {
+      var i = keys.indexOf(document.activeElement.dataset ? document.activeElement.dataset.k : '');
+      if (i < 0) return;
+      var n = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: keys.length - 1 }[e.key];
+      if (n === undefined) return;
+      e.preventDefault();
+      showTab(keys[(n + keys.length) % keys.length], true);
+    });
     showTab('Pães');
 
     /* ---------- encomenda rápida ---------- */
