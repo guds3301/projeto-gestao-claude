@@ -1,14 +1,34 @@
 {
   "extraKnownMarketplaces": {
     "thedotmack": {
-      "source": { "source": "github", "repo": "thedotmack/claude-mem" }
+      "source": {
+        "source": "github",
+        "repo": "thedotmack/claude-mem"
+      }
     },
     "headroom-marketplace": {
-      "source": { "source": "github", "repo": "headroomlabs-ai/headroom" }
+      "source": {
+        "source": "github",
+        "repo": "headroomlabs-ai/headroom"
+      }
     }
   },
   "enabledPlugins": {
     "claude-mem@thedotmack": true,
     "headroom@headroom-marketplace": true
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/install-headroom.sh",
+            "timeout": 300
+          }
+        ]
+      }
+    ]
   }
 }
